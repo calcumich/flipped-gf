@@ -1,0 +1,24 @@
+Traceback (most recent call last):
+  File "train.py", line 159, in <module>
+    main(args)
+  File "train.py", line 130, in main
+    train_stats = train_one_epoch(model, data_loader_train, optimizer, epoch, loss_scaler, args=args)   #what objects are being created in these two method calls?
+  File "/home/cjcal/545/Flipped-VQA-S/engine.py", line 24, in train_one_epoch
+    vqa_loss, vaq_loss, qav_loss = model(data)
+  File "/home/cjcal/.conda/envs/flipped-vqa/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1102, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/cjcal/545/Flipped-VQA-S/llama/model.py", line 258, in forward
+    qav_h = layer(qav_h, start_pos, freqs_cis, mask, adapter[i].half(), None)
+  File "/home/cjcal/.conda/envs/flipped-vqa/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1102, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/cjcal/545/Flipped-VQA-S/llama/model.py", line 158, in forward
+    out = h + self.feed_forward.forward(self.ffn_norm(h))
+  File "/home/cjcal/545/Flipped-VQA-S/llama/model.py", line 141, in forward
+    return self.w2(F.silu(self.w1(x)) * self.w3(x))
+  File "/home/cjcal/.conda/envs/flipped-vqa/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1102, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/cjcal/.conda/envs/flipped-vqa/lib/python3.8/site-packages/torch/nn/modules/linear.py", line 103, in forward
+    return F.linear(input, self.weight, self.bias)
+  File "/home/cjcal/.conda/envs/flipped-vqa/lib/python3.8/site-packages/torch/nn/functional.py", line 1848, in linear
+    return torch._C._nn.linear(input, weight, bias)
+RuntimeError: CUDA out of memory. Tried to allocate 44.00 MiB (GPU 0; 44.35 GiB total capacity; 41.26 GiB already allocated; 42.25 MiB free; 42.72 GiB reserved in total by PyTorch) If reserved memory is >> allocated memory try setting max_split_size_mb to avoid fragmentation.  See documentation for Memory Management and PYTORCH_CUDA_ALLOC_CONF
