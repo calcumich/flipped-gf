@@ -12,6 +12,11 @@ import torch.nn.functional as F
 from torch.nn import Embedding, Linear
 import torch
 
+#"This module [dataclass] provides a decorator and functions 
+#for automatically adding generated special methods such as 
+#__init__() and __repr__() to user-defined classes."
+#https://docs.python.org/3/library/dataclasses.html
+# also __eq__ and __hash__
 @dataclass
 class ModelArgs:
     dim: int = 512
@@ -28,6 +33,14 @@ class ModelArgs:
 
 
 class RMSNorm(torch.nn.Module):
+    """ 
+    Custom Layer: implement RMS Norm
+    Can be used to perform layer normalization where each feature vector 
+    in a batch is normalized based on its root mean square value 
+    and then scaled by a learnable parameter. 
+    Stabilizes the training of networks via normalization
+    """
+
     def __init__(self, dim: int, eps: float = 1e-6):
         super().__init__()
         self.eps = eps
@@ -42,6 +55,11 @@ class RMSNorm(torch.nn.Module):
 
 
 def precompute_freqs_cis(dim: int, end: int, theta: float = 10000.0):
+    """
+    dim: dimensionality of the encoding.
+    end: Either the sequence length/the number of position encodings to generate
+    theta: A scaling factor used in the frequency computation.
+    """
     freqs = 1.0 / (theta ** (torch.arange(0, dim, 2)[: (dim // 2)].float() / dim))
     t = torch.arange(end, device=freqs.device)  # type: ignore
     freqs = torch.outer(t, freqs).float()  # type: ignore
@@ -64,7 +82,6 @@ def apply_rotary_emb(xq: torch.Tensor, xk: torch.Tensor, freqs_cis: torch.Tensor
     xq_out = torch.view_as_real(xq_ * freqs_cis).flatten(3)
     xk_out = torch.view_as_real(xk_ * freqs_cis).flatten(3)
     return xq_out.type_as(xq), xk_out.type_as(xk)
-
 
 class Attention(nn.Module):
     def __init__(self, args: ModelArgs):
