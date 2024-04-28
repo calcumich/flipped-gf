@@ -4,7 +4,7 @@ import sys
 from typing import Iterable
 import util.misc as misc
 import util.lr_sched as lr_sched
-
+from tqdm import tqdm
 
 def train_one_epoch(model: torch.nn.Module, data_loader: Iterable, optimizer: torch.optim.Optimizer, epoch: int, loss_scaler, args=None):
     model.train(True)
@@ -16,8 +16,10 @@ def train_one_epoch(model: torch.nn.Module, data_loader: Iterable, optimizer: to
 
     optimizer.zero_grad()
 
-    for data_iter_step, data in enumerate(metric_logger.log_every(data_loader, print_freq, header)):
-
+    for data_iter_step, data in enumerate(tqdm(metric_logger.log_every(data_loader, print_freq, header))):
+        if data_iter_step % 5 == 0:
+            print(f"Epoch: {epoch} Step: {data_iter_step}")
+            misc.printMemory()
         if data_iter_step % accum_iter == 0:
             lr_sched.adjust_learning_rate(optimizer, data_iter_step / len(data_loader) + epoch, args)
 

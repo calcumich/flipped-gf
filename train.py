@@ -69,6 +69,10 @@ def get_args_parser():
 
 
 def main(args):
+    print(f"Start Epoch: {args.start_epoch}")
+    print(f"Epochs: {args.epochs}")
+    for epoch in range(args.start_epoch, args.epochs):
+        print(f"fake epoch {epoch}")
     misc.init_distributed_mode(args)
 
     print('job dir: {}'.format(os.path.dirname(os.path.realpath(__file__))))
@@ -120,6 +124,8 @@ def main(args):
 
     print(f"Start training for {args.epochs} epochs")
     start_time = time.time()
+    print(f"Start Epoch: {args.start_epoch}")
+    print(f"Epochs: {args.epochs}")
     for epoch in range(args.start_epoch, args.epochs):
 
         if args.distributed:
@@ -154,6 +160,13 @@ def main(args):
 if __name__ == '__main__':
     args = get_args_parser()
     args = args.parse_args()
+    args_dict = vars(args)
+
+    print("Args:")
+    for k, v in args_dict.items():
+        print(f"{k}, {v}")
     if args.output_dir:
         Path(args.output_dir).mkdir(parents=True, exist_ok=True)
+    print("\nStarting Main...\n")
     main(args)
+    print("\nMain Finished\n")
