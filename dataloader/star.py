@@ -1,3 +1,4 @@
+
 import torch
 from .base_dataset import BaseDataset
 import json
@@ -7,7 +8,7 @@ class STAR(BaseDataset):
         super().__init__(args, tokenizer, split)
         self.data = json.load(open(f'./data/star/STAR_{split}.json', 'r'))
         
-        ######### self.features = torch.load(f'./data/star/clipvitl14.pth')
+        self.videofeatures = torch.load(f'./data/star/clipvitl14.pth')
 
         self.features = json.load(open(f'./data/star/features.json', 'r'))
 
@@ -39,22 +40,39 @@ class STAR(BaseDataset):
         if video_id not in list(self.features.keys()):
             print(video_id)
             video = torch.zeros(1, self.features_dim)
+            print("Star.py - Feature_dim",self.features_dim)
         else:
-            #video = self.features[video_id][start: end +1, :].float() # ts
+            oldvideo = self.videofeatures[video_id][start: end +1, :].float() # ts
+            print("Start.py - Old video shape", oldvideo.shape)
             video = torch.tensor(self.features[video_id])          ############  Check cuda version, changed cuda from here
+            print("Start.py - New video shape", video.shape)
 
-        if len(video) > self.max_feats:
+        if len(video) > 10:
             sampled = []
-            for j in range(self.max_feats):
-                sampled.append(video[(j * len(video)) // self.max_feats])
+            for j in range(10):
+                sampled.append(video[(j * len(video)) // 10])
             video = torch.stack(sampled)
-            video_len = self.max_feats
-        elif len(video) < self.max_feats:
+            video_len = 10
+        elif len(video) < 10:
             video_len = len(video)
-            video = torch.cat([video, torch.zeros(self.max_feats - video_len, self.features_dim)], 0)
+            video = torch.cat([video, torch.zeros(10 - video_len, 512)], 0)
         else:
-            video_len = self.max_feats
-        #print(video.shape)
+            video_len = 10
+        
+        if len(oldvideo) > 10:
+            sampled = []
+            for j in range(10):
+                sampled.append(oldvideo[(j * len(oldvideo)) // self.max_feats])
+            oldvideo = torch.stack(sampled)
+            oldvideo_len = 10
+        elif len(oldvideo) < 10:
+            oldvideo_len = len(oldvideo)
+            oldvideo = torch.cat([oldvideo, torch.zeros(10 - oldvideo_len, 768)], 0)
+        else:
+            oldvideo_len = 10
+
+        video = torch.cat((oldvideo, video), dim=1)
+        print("Start.py - New video shape", video.shape)
         #print(video_len)
         return video, video_len
     

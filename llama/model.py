@@ -1,3 +1,4 @@
+
 # Copyright (c) Meta Platforms, Inc. and affiliates.
 # This software may be used and distributed according to the terms of the GNU General Public License version 3.
 
@@ -12,11 +13,6 @@ import torch.nn.functional as F
 from torch.nn import Embedding, Linear
 import torch
 
-#"This module [dataclass] provides a decorator and functions 
-#for automatically adding generated special methods such as 
-#__init__() and __repr__() to user-defined classes."
-#https://docs.python.org/3/library/dataclasses.html
-# also __eq__ and __hash__
 @dataclass
 class ModelArgs:
     dim: int = 512
@@ -33,14 +29,6 @@ class ModelArgs:
 
 
 class RMSNorm(torch.nn.Module):
-    """ 
-    Custom Layer: implement RMS Norm
-    Can be used to perform layer normalization where each feature vector 
-    in a batch is normalized based on its root mean square value 
-    and then scaled by a learnable parameter. 
-    Stabilizes the training of networks via normalization
-    """
-
     def __init__(self, dim: int, eps: float = 1e-6):
         super().__init__()
         self.eps = eps
@@ -55,11 +43,6 @@ class RMSNorm(torch.nn.Module):
 
 
 def precompute_freqs_cis(dim: int, end: int, theta: float = 10000.0):
-    """
-    dim: dimensionality of the encoding.
-    end: Either the sequence length/the number of position encodings to generate
-    theta: A scaling factor used in the frequency computation.
-    """
     freqs = 1.0 / (theta ** (torch.arange(0, dim, 2)[: (dim // 2)].float() / dim))
     t = torch.arange(end, device=freqs.device)  # type: ignore
     freqs = torch.outer(t, freqs).float()  # type: ignore
@@ -82,6 +65,7 @@ def apply_rotary_emb(xq: torch.Tensor, xk: torch.Tensor, freqs_cis: torch.Tensor
     xq_out = torch.view_as_real(xq_ * freqs_cis).flatten(3)
     xk_out = torch.view_as_real(xk_ * freqs_cis).flatten(3)
     return xq_out.type_as(xq), xk_out.type_as(xk)
+
 
 class Attention(nn.Module):
     def __init__(self, args: ModelArgs):
@@ -175,6 +159,21 @@ class TransformerBlock(nn.Module):
         out = h + self.feed_forward.forward(self.ffn_norm(h))
         return out
 
+class VideoTransformer(nn.Module):
+    def __init__(self, input_size, out_len):
+        super(VideoTransformer, self).__init__()
+        self.transformer = nn.Transformer(d_model=input_size, nhead=8, num_encoder_layers=6)
+        self.fc = nn.Linear(input_size, out_len)
+
+    def forward(self, x):
+        x = x.permute(1,0,2)
+        tgt = torch.zeros_like(x)
+        # Transformer expects input of shape (seq_length, batch_size, input_size)
+        x = self.transformer(x,tgt)  # Apply transformer
+        x = self.fc(x[-1, :, :])  # Apply linear layer to the last output sequence
+        return x
+
+
 
 class Transformer(nn.Module):
     def __init__(self, params: ModelArgs, args):
@@ -191,7 +190,8 @@ class Transformer(nn.Module):
         self.tok_embeddings = Embedding(params.vocab_size, params.dim)
 
         self.adapter_query = Embedding(params.adapter_len * params.adapter_layer, params.dim)
-        self.visual_proj = Linear(512, params.dim, bias=False)                 ########################## changed from 768
+        self.visual_proj = VideoTransformer(input_size=1280, out_len=params.dim)
+        #self.visual_proj = Linear(512, params.dim, bias=False)                 ########################## changed from 768
         self.temporal_emb = Embedding(self.max_feats, params.dim)
         self.adapter_len = params.adapter_len
         self.adapter_layer = params.adapter_layer
@@ -214,10 +214,13 @@ class Transformer(nn.Module):
         self.tau = args.tau
 
     def forward(self, data, inference=False):
+        print(data)
         video = data['video'].cuda()
         vqa_id, vaq_id, qav_id = data['text_id']['vqa'].cuda(), data['text_id']['vaq'].cuda(), data['text_id']['qav'].cuda()
         vqa_label, vaq_label, qav_label = data['label']['vqa'].cuda(), data['label']['vaq'].cuda(), data['label']['qav'].cuda()
-        vqa_video_start, vaq_video_start, qav_video_index = data['video_start']['vqa'][0], data['video_start']['vaq'][0], data['video_index']['qav'].cuda()
+        vqa_video_start = data['video_start']['vqa'][0]
+        vaq_video_start = data['video_start']['vaq'][0]
+        qav_video_index = data['video_index']['qav'].cuda()
         
         bsz, n_options, seqlen = vqa_id.shape
         vqa_id, vaq_id = vqa_id.reshape(-1, seqlen), vaq_id.reshape(-1, seqlen)
@@ -248,7 +251,9 @@ class Transformer(nn.Module):
         vaq_loss, qav_loss = torch.tensor([0]).cuda(), torch.tensor([0]).cuda()
         
         adapter = self.adapter_query.weight.reshape(-1, self.adapter_len, self.params.dim).unsqueeze(1)
-        _video_feature = self.visual_proj(video)
+        print(f"shape of video: {video.shape}")
+        video_d = video.unsqueeze(1).permute(1,0,2)
+        _video_feature = self.visual_proj(video_d)
         if inference:
             _video_feature = _video_feature.unsqueeze(1).repeat(1, n_options, 1, 1).view(-1, _video_feature.shape[-2], _video_feature.shape[-1])
         video_feature = (_video_feature + self.temporal_emb.weight[None, :, :]).half()
