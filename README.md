@@ -10,7 +10,7 @@ Look at pre processing YTCommentQA python notebook (pre-processing-YTCommentsQA.
 To install requirements, run:
 ```
 git clone https://github.com/calcumich/flipped-gf
-cd Flipped-VQA
+cd flipped-gf
 mkdir data
 conda create -n flipped-vqa python=3.8
 conda activate flipped-vqa
