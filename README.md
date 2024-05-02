@@ -6,9 +6,6 @@ Look at STAR EDA python notebook (Star_EDA.ipynb)
 ### YTCommentQA
 Look at pre processing YTCommentQA python notebook (pre-processing-YTCommentsQA.ipynb)
 
-## Reference:
-Our model is based heavily on [Flipped-VQA](https://github.com/mlvlab/Flipped-VQA), and we aim to combine it's innovations with those of [Glance-and-Focus](https://github.com/ByZ0e/Glance-Focus).
-
 ## Setup
 To install requirements, run:
 ```
@@ -65,6 +62,19 @@ To run training or inference script on Greatlakes refer example_greatlakes_job.s
 Download Features for STAR dataset. 
 You can download the dataset annotation files and features directly to the `DEFAULT_DATASET_DIR`.\
 [Google Drive](https://drive.google.com/file/d/11sI_iW_42yetN2U8WdwsdARmQPhdhQht/view?usp=sharing).
+It should have the following structure:
+```
+├── /STAR/
+│  ├── /txt_db/
+│  │  ├── action_mapping.txt
+│  │  ├── events.json
+│  │  ├── test.jsonl
+│  │  ├── train.jsonl
+│  │  └── val.jsonl
+│  ├── /vis_db/
+│  │  ├── s3d.pth
+│  │  └── strID2numID.json
+```
 
 - unsupervised setting
 ```
