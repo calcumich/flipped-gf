@@ -22,7 +22,7 @@ sh setup.sh
 
 ## Dataset & LLaMA Preparation
 
-You can download preprocessed STAR dataset at [here](https://drive.google.com/drive/folders/1WuvatnwVXphXlSdcW9UpUuIjs1vn1Tms). Put them in ```./data```. Also, you can download original LLaMA at [here](https://github.com/facebookresearch/llama/tree/llama_v1), and put the checkpoint in ```./pretrained```. 
+You can download preprocessed STAR dataset at [here](https://drive.google.com/drive/folders/1WuvatnwVXphXlSdcW9UpUuIjs1vn1Tms). Put them in ```./data```. Also, you can download the checkpoint for LLaMa by requesting access from Meta and put it in ```./pretrained```. 
 
 ```
 ./pretrained
