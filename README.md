@@ -1,6 +1,6 @@
 # Glance - Flipped - VQA Project
 
-## Dataset exploration
+## Dataset Exploration
 ### STAR EDA
 Look at STAR EDA python notebook
 ### YTCommentQA
