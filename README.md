@@ -2,9 +2,9 @@
 
 ## Dataset Exploration
 ### STAR EDA
-Look at STAR EDA python notebook
+Look at STAR EDA python notebook (Star_EDA.ipynb)
 ### YTCommentQA
-Look at pre processing YTCommentQA python notebook
+Look at pre processing YTCommentQA python notebook (pre-processing-YTCommentsQA.ipynb)
 
 ## Setup
 To install requirements, run:
