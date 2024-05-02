@@ -12,8 +12,8 @@ To install requirements, run:
 git clone https://github.com/calcumich/flipped-gf
 cd flipped-gf
 mkdir data
-conda create -n flipped-vqa python=3.8
-conda activate flipped-vqa
+conda create -n flipped-gf python=3.8
+conda activate flipped-gf
 sh setup.sh
 ```
 
