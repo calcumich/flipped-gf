@@ -58,7 +58,9 @@ From the training command, simply replace ```train.py``` to ```eval.py``` and ad
 ## Greatlakes at UM
 To run training or inference script on Greatlakes refer example_greatlakes_job.sh 
 
-## Training the Glance model 
+## Getting the Key-Memories of a Video from the Glance Model
+
+## Training  
 
 Download Features for STAR dataset. 
 You can download the dataset annotation files and features directly to the `DEFAULT_DATASET_DIR`.\
