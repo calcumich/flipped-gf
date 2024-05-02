@@ -6,6 +6,9 @@ Look at STAR EDA python notebook (Star_EDA.ipynb)
 ### YTCommentQA
 Look at pre processing YTCommentQA python notebook (pre-processing-YTCommentsQA.ipynb)
 
+## Reference:
+Our model is based heavily on [Flipped-VQA](https://github.com/mlvlab/Flipped-VQA), and we aim to combine it's innovations with those of [Glance-and-Focus](https://github.com/ByZ0e/Glance-Focus).
+
 ## Setup
 To install requirements, run:
 ```
