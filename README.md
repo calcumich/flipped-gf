@@ -47,5 +47,8 @@ torchrun --rdzv_endpoint 127.0.0.1:1234 --nproc_per_node 4 train.py --model 7B \
 ## Evaluation
 From the training command, simply replace ```train.py``` to ```eval.py``` and add ```--resume ./your/checkpoint.pth```.
 
+## Greatlakes at UM
+To run training or inference script on Greatlakes refer example_greatlakes_job.sh 
+
 
 
